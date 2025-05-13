@@ -45,20 +45,21 @@ async function buyToken(tokenKey, amountInputId) {
       presaleConfig[tokenKey].address,
       presaleConfig[tokenKey].abi,
       signer
-    );
-    const amount = document.getElementById(amountInputId).value;
-    const usdtPrice = manualPrices[tokenKey];
-    const totalUsdt = parseFloat(usdtPrice) * parseFloat(amount);
-    const bnbAmount = usdtToBnb(totalUsdt);
-    const bnbAmountStr = Number(bnbAmount).toFixed(18);
+    );// ...existing code...
+const amount = parseFloat(document.getElementById(amountInputId).value);
+const usdtPrice = parseFloat(manualPrices[tokenKey]);
+const totalUsdt = usdtPrice * amount;
 
-    document.getElementById("presaleStatus").textContent = "⏳ Sending transaction...";
-    // Call buyTokens with NO arguments, only value
-    const tx = await contract.buyTokens({
-      value: ethers.parseEther(bnbAmountStr)
-    });
-    await tx.wait();
-    document.getElementById("presaleStatus").textContent = "✅ Purchase successful!";
+const bnbAmount = totalUsdt / BNB_USDT_RATE;
+const value = ethers.parseEther(bnbAmount.toFixed(18));
+
+document.getElementById("presaleStatus").textContent = "⏳ Sending transaction...";
+const tx = await contract.buyTokens({
+  value: value
+});
+await tx.wait();
+document.getElementById("presaleStatus").textContent = "✅ Purchase successful!";
+// ...existing code...
   } catch (err) {
     document.getElementById("presaleStatus").textContent = "❌ " + (err.message || "Transaction failed");
   }
